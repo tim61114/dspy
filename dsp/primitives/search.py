@@ -9,13 +9,13 @@ def retrieve(query: str, k: int, **kwargs) -> list[str]:
     """Retrieves passages from the RM for the query and returns the top k passages."""
     if not dsp.settings.rm:
         raise AssertionError("No RM is loaded.")
-    passages = dsp.settings.rm(query, **kwargs).passages
+    passages = dsp.settings.rm(query, k=k, **kwargs)
     if not isinstance(passages, Iterable):
         # it's not an iterable yet; make it one.
         # TODO: we should unify the type signatures of dspy.Retriever
         passages = [passages]
     passages = [psg.long_text for psg in passages]
-    
+
     if dsp.settings.reranker:
         passages_cs_scores = dsp.settings.reranker(query, passages)
         passages_cs_scores_sorted = np.argsort(passages_cs_scores)[::-1]
